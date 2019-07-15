@@ -15,7 +15,7 @@ function addApartmentsComponent() {
 }
 
 function addApartmentComponent(){
-
+  require('./components/react-apartment-component');
 }
 
 function addMap() {
@@ -87,11 +87,7 @@ function init() {
     addApartmentsComponent();
   }
 
-  //Questo sarà vero nella home.
-  if ($('#apartment-component-wrapper').length) {
-    addApartmentComponent();
-  }
-
+  addApartmentComponent();
   addAddressSearchComponent();
   addAdvancedSearchComponent();
 

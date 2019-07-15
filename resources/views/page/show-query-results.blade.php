@@ -5,19 +5,19 @@
   @include('layouts.header')
 
   <div id="advanced-search-component-wrapper">
-    <advanced-search-component services={{$services}} searched-address="{{$address}}" rooms="@php
+    <advanced-search-component data-searched-address="{{$address}}" data-rooms="@php
     if (isset($numberOfRooms)){
       echo $numberOfRooms;
     } else {
       echo 0;
     }
-    @endphp" bedrooms="@php
+    @endphp" data-bedrooms="@php
     if (isset($bedrooms)){
       echo $bedrooms;
     } else {
       echo 0;
     }
-    @endphp" radius="{{$maxDistance}}" lat={{$lat}} lon={{$lon}}></advanced-search-component>
+    @endphp" data-radius="{{$maxDistance}}" data-lat={{$lat}} data-lon={{$lon}}></advanced-search-component>
   </div>
 
 @endsection

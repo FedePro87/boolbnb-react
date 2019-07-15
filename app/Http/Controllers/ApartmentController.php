@@ -108,7 +108,7 @@ class ApartmentController extends Controller
     return $statsArray;
   }
 
-  public function showSponsored(){
+  public function showSponsored(Request $request){
     $sponsoreds=[];
     $sponsorships= Sponsorship::all();
 
@@ -140,7 +140,16 @@ class ApartmentController extends Controller
       }
     }
 
-    return view('page.sponsored-apartment', compact('sponsoreds'));
+    if ($request->ajax()) {
+      return response()->json(['apartments' => $sponsoreds]);
+    } else {
+      return view('page.sponsored-apartment', compact('sponsoreds'));
+    }
+  }
+
+  public function getServices(){
+    $services=Service::all();
+    return json_encode($services);
   }
 
   public function apartmentSearch(Request $request){

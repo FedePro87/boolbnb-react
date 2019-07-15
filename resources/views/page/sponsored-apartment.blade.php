@@ -20,7 +20,6 @@
         <form action="{{route('apartment-search')}}" method="get">
           <div class="form-group">
             <div id="address-search-component-wrapper"></div>
-            {{-- <address-search-component :home-search=true></address-search-component> --}}
           </div>
           <input class="boolbnb-btn" type="submit" name="" value="SEARCH">
         </form>
@@ -33,13 +32,10 @@
 
 @section('content')
   <div class="container-fluid mt-5">
-    <div id="apartments-component-wrapper" v-if="{{count($sponsoreds)}}>0" class="d-flex flex-wrap justify-content-center">
-      @foreach ($sponsoreds as $sponsored)
-        <div class="apartment col-lg-4">
-          <apartment-component :apartment="{{$sponsored}}"></apartment-component>
-        </div>
-      @endforeach
-      <h1 v-if="{{count($sponsoreds)}}===0">Non ci sono appartamenti sponsorizzati!</h1>
+    <div id="apartments-component-wrapper" class="d-flex flex-wrap justify-content-center">
+      <div class="apartment col-lg-4">
+        <apartment-component></apartment-component>
+      </div>
     </div>
   </div>
 

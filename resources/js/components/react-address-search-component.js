@@ -6,7 +6,7 @@ export default class AddressSearchComponent extends Component {
     super(props)
 
     this.state = {
-      realTimeAddress: '',
+      realTimeAddress: this.props.address,
       results:[],
       homeSearch:true,
       addressesSelected:false,
@@ -148,7 +148,7 @@ export default class AddressSearchComponent extends Component {
         <input type="hidden" name="lat" value={this.state.latComp}/>
         <input type="hidden" name="lon" value={this.state.lonComp}/>
         <div className="close-results-wrapper">
-          <input onFocus={this.addressFocus} onChange={this.addressChanged} value={this.state.realTimeAddress} className="address-search-spa" type="text" placeholder="Insert address..."/><i className={this.state.showClose ? 'fas fa-times' : ''} onClick={this.closeButtonClicked}></i>
+          <input name="address" onFocus={this.addressFocus} onChange={this.addressChanged} value={this.state.realTimeAddress} className="address-search-spa" type="text" placeholder="Insert address..."/><i className={this.state.showClose ? 'fas fa-times' : ''} onClick={this.closeButtonClicked}></i>
         </div>
         <div className="query-results">
           {this.state.results.map((value, index) => {
