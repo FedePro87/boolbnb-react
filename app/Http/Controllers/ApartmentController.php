@@ -108,7 +108,20 @@ class ApartmentController extends Controller
     return $statsArray;
   }
 
-  public function showSponsored(Request $request){
+  public function getSponsoreds(){
+    $apartments= $this->showSponsored()->sponsoreds;
+    $maxResults=3;
+
+    $randIndex = array_rand($apartments, $maxResults);
+
+    for ($i=0; $i < $maxResults; $i++) {
+      $sponsoredApartments[]= $apartments[$randIndex[$i]];
+    }
+
+    return json_encode($sponsoredApartments);
+  }
+
+  public function showSponsored(){
     $sponsoreds=[];
     $sponsorships= Sponsorship::all();
 
@@ -140,11 +153,7 @@ class ApartmentController extends Controller
       }
     }
 
-    if ($request->ajax()) {
-      return response()->json(['apartments' => $sponsoreds]);
-    } else {
-      return view('page.sponsored-apartment', compact('sponsoreds'));
-    }
+    return view('page.sponsored-apartment', compact('sponsoreds'));
   }
 
   public function getServices(){

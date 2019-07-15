@@ -34,7 +34,7 @@
   <div class="container-fluid mt-5">
     <div id="apartments-component-wrapper" class="d-flex flex-wrap justify-content-center">
       <div class="apartment col-lg-4">
-        <apartment-component></apartment-component>
+        <apartment-component data-sponsoreds=true></apartment-component>
       </div>
     </div>
   </div>

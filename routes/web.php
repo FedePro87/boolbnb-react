@@ -28,5 +28,6 @@ Route::post('/user/sponsorship/{id}', 'SponsorshipController@updateSponsor')->na
 Route::get('/user/{id}/apartment', 'HomeController@showUserApartments')->name('showUserApartments');
 Route::post('/user/message/{id}', 'HomeController@storeMessage')->name('create-message');
 Route::get('/services', 'ApartmentController@getServices')->name('getServices');
+Route::get('/sponsoreds', 'ApartmentController@getSponsoreds')->name('getSponsoreds');
 
 Route::get('/payment/process/{amount}/{apartmentId}/{sponsorshipId}', 'SponsorshipController@process')->name('payment.process');

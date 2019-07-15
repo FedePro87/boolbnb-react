@@ -4,21 +4,20 @@ import axios from 'axios';
 
 export default class ApartmentComponent extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       apartments:[]
     }
-
-    this.getSponsoreds();
+    if (this.props.sponsoreds) {
+      this.getSponsoreds();
+    }
   }
 
   getSponsoreds(){
-    axios.get(`/`)
+    axios.get(`/sponsoreds`)
     .then(res => {
-      this.setState({apartments:res.data.apartments},function() {
-        console.log(this.state.apartments);
-      });
+      this.setState({apartments:res.data})
     })
     .catch((error) => {
       console.log(error);
@@ -49,5 +48,7 @@ export default class ApartmentComponent extends Component {
 }
 
 if (document.getElementById('apartments-component-wrapper')) {
-  ReactDOM.render(<ApartmentComponent />, document.getElementById('apartments-component-wrapper'));
+  const apartmentComponent = document.querySelector('[data-sponsoreds]');
+  const props = Object.assign({},apartmentComponent.dataset);
+  ReactDOM.render(<ApartmentComponent {...props}/>, document.getElementById('apartments-component-wrapper'));
 }
