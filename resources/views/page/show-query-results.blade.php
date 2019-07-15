@@ -37,8 +37,12 @@
   <div class="result-box ml-5">
     <h3>Risultati:</h3>
 
-    <div id="apartments-component-wrapper">
-      <apartments-component v-bind:apartments-prop="{{$queryApartments}}"></apartments-component>
+    <div class="container-fluid mt-5">
+      <div id="apartments-component-wrapper" class="d-flex flex-wrap justify-content-center">
+        <div class="apartment col-lg-4">
+          <apartment-component data-sponsoreds=false data-searched-address="{{$address}}"></apartment-component>
+        </div>
+      </div>
     </div>
   </div>
 @stop

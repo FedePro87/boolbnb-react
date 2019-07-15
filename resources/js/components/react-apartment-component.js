@@ -11,6 +11,8 @@ export default class ApartmentComponent extends Component {
     }
     if (this.props.sponsoreds) {
       this.getSponsoreds();
+    } else {
+      this.getResults();
     }
   }
 
@@ -24,23 +26,39 @@ export default class ApartmentComponent extends Component {
     });
   }
 
+  getSponsoreds(){
+    //Qui dovresti chiamare la funzione search del componente addressSearch e farti ritornare i risultati
+    axios.get(`/search`, {
+      params: {
+        advancedSearch:true,
+
+      }
+    })
+    .then(res => {
+      console.log(res);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
   render() {
     return (
       <div className="d-flex flex-wrap">
       {this.state.apartments.map((value, index) => {
-      return <div  key={index} className="apartment col-lg-4 p-5">
-      <div className="apartment-wrapper">
+        return <div  key={index} className="apartment col-lg-4 p-5">
+        <div className="apartment-wrapper">
         <a href="showIndex">
-          <img src={value.image} className="img-fluid"/>
-          <div className="content-apartment">
-            <span className="description">{value.description}</span>
-            <span className="address">{value.address}</span>
-            <span>{value.visuals.length} visualizzazione</span>
-            <span>{value.visuals.length} visualizzazioni</span>
-          </div>
+        <img src={value.image} className="img-fluid"/>
+        <div className="content-apartment">
+        <span className="description">{value.description}</span>
+        <span className="address">{value.address}</span>
+        <span>{value.visuals.length} visualizzazione</span>
+        <span>{value.visuals.length} visualizzazioni</span>
+        </div>
         </a>
-      </div>
-      </div>
+        </div>
+        </div>
       })}
       </div>
     );
