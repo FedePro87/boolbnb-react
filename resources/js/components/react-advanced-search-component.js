@@ -3,17 +3,23 @@ import ReactDOM from 'react-dom';
 import axios from 'axios';
 import AddressSearchComponent from './react-address-search-component';
 
-export default class AdvancedSearchComponent extends Component {
+export default class AdvancedSearch extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      services:[]
+      services:[],
+      queryServices:[],
+      number_of_rooms:0,
+      bedrooms:0,
+      radius:200,
+      updateNow:false
     };
 
     this.buildServices=this.buildServices.bind(this);
     this.optionSelected=this.optionSelected.bind(this);
     this.checkboxSelected=this.checkboxSelected.bind(this);
+    this.stopUpdate=this.stopUpdate.bind(this);
 
     this.buildServices();
   }
@@ -36,7 +42,7 @@ export default class AdvancedSearchComponent extends Component {
     let arr = [];
 
     for (let i = 1; i <= 5; i=i+1) {
-      arr.push(<option key={i} value="{i*200}">{i*200}</option>)
+      arr.push(<option key={i} value={i*200}>{i*200}</option>)
     }
 
     return arr;
@@ -55,45 +61,44 @@ export default class AdvancedSearchComponent extends Component {
 
   }
 
+  stopUpdate(){
+    this.setState({updateNow:false});
+  }
+
   optionSelected(e) {
     switch (e.target.name) {
       case 'number_of_rooms':
-      this.realTimeRooms=e.target.value;
+      this.setState({number_of_rooms:e.target.value,updateNow:true},function(){this.forceUpdate();});
       break;
       case 'bedrooms':
-      this.realTimeBedrooms=e.target.value;
+      this.setState({bedrooms:e.target.value,updateNow:true},function(){this.forceUpdate();});
       break;
       case 'radius':
-      this.realTimeRadius=e.target.value;
+      this.setState({radius:e.target.value,updateNow:true},function(){this.forceUpdate();});
       break;
     }
-
-    this.eventHub.$emit('search', {
-      "number_of_rooms":this.realTimeRooms,
-      "bedrooms":this.realTimeBedrooms,
-      "radius":this.realTimeRadius,
-      "services":this.selectedCheckboxes
-    });
   }
 
   checkboxSelected(e){
+    let tempArray=this.state.queryServices;
+
     if (e.target.checked) {
-      this.selectedCheckboxes.push(e.target.defaultValue);
+      tempArray.push(e.target.defaultValue);
     } else {
-      for( let i = 0; i < this.selectedCheckboxes.length; i=i+1){
-        if (this.selectedCheckboxes[i]===e.target.defaultValue) {
-          this.selectedCheckboxes.splice(i, 1);
+      for( let i = 0; i < tempArray.length; i=i+1){
+        if (tempArray[i]===e.target.defaultValue) {
+          tempArray.splice(i, 1);
         }
       }
     }
 
-    this.search(true);
+    this.setState({queryServices:tempArray,updateNow:true},function(){this.forceUpdate();});
   }
 
   render() {
     return (
       <div className="search-wrapper">
-        <AddressSearchComponent address={this.props.searchedAddress}/>
+        <AddressSearchComponent stopUpdate={this.stopUpdate} updateNow={this.state.updateNow} home={false} number_of_rooms={this.state.number_of_rooms} bedrooms={this.state.bedrooms} radius={this.state.radius} queryServices={this.state.queryServices} advancedSearch={true} updateResults={this.props.updateResults} address={this.props.address}/>
 
         <div className="address-search-wrapper search-bar row">
           <div className="col-lg-2 p-3 m-4">
@@ -105,14 +110,14 @@ export default class AdvancedSearchComponent extends Component {
 
           <div className="col-lg-2 p-3 m-4">
             <label htmlFor="bedrooms"><h2>Bedrooms</h2></label>
-            <select onChange={this.optionSelected.bind(this)} name="bedrooms">
+            <select onChange={this.optionSelected} name="bedrooms">
               {this.buildOptions()}
             </select><br/>
           </div>
 
           <div className="col-lg-2 p-3 m-4">
             <label htmlFor="radius"><h2>Distanza</h2></label>
-            <select onChange={this.optionSelected.bind(this)} name="radius">
+            <select onChange={this.optionSelected} name="radius">
               {this.buildRadius()}
             </select><br/>
           </div>
@@ -122,7 +127,7 @@ export default class AdvancedSearchComponent extends Component {
           <label className="title" htmlFor="service">Services</label><br/>
           <div className="d-flex justify-content-around service-box">
             {this.state.services.map((value, index) => {
-              return <label key={index}><input className="text-center" onChange={this.checkboxSelected} type="checkbox" name="services[]" value="{value.id}"/>
+              return <label key={index}><input className="text-center" onChange={this.checkboxSelected} type="checkbox" name="services[]" value={value.id}/>
                 {value.name}</label>
             })}
           </div>
@@ -132,9 +137,9 @@ export default class AdvancedSearchComponent extends Component {
   }
 }
 
-if (document.getElementById('advanced-search-component-wrapper')) {
-  const advSearcComponent = document.querySelector('[data-rooms]');
-  const props = Object.assign({},advSearcComponent.dataset);
-
-  ReactDOM.render(<AdvancedSearchComponent {...props}/>, document.getElementById('advanced-search-component-wrapper'));
-}
+// if (document.getElementById('advanced-search-component-wrapper')) {
+//   const advSearcComponent = document.querySelector('[data-rooms]');
+//   const props = Object.assign({},advSearcComponent.dataset);
+//
+//   ReactDOM.render(<AdvancedSearchComponent {...props}/>, document.getElementById('advanced-search-component-wrapper'));
+// }

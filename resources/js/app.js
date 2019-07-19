@@ -1,21 +1,18 @@
 require('./bootstrap');
+import React, { Component } from 'react';
 
 var Chart = require('chart.js');
+
+function addAppComponent(){
+  require ('./components/react-app-component');
+}
 
 function addAddressSearchComponent() {
   require('./components/react-address-search-component');
 }
 
-function addAdvancedSearchComponent() {
-  require('./components/react-advanced-search-component');
-}
-
 function addApartmentsComponent() {
-
-}
-
-function addApartmentComponent(){
-  require('./components/react-apartment-component');
+  require('./components/react-apartment-component')
 }
 
 function addMap() {
@@ -82,14 +79,17 @@ function init() {
     addStatsCharts($('#messagesChart'),'Messages');
   }
 
-  //Tutte le volte che avremo un wrapper degli appartamenti questo sarà vero (ricerca avanzata).
-  if ($('#apartments-component-wrapper').length) {
-    addApartmentsComponent();
+  if (document.getElementById('app')) {
+    addAppComponent();
   }
 
-  addApartmentComponent();
-  addAddressSearchComponent();
-  addAdvancedSearchComponent();
+  if (document.getElementById('address-search-component-wrapper')) {
+    addAddressSearchComponent();
+  }
+
+  if (document.getElementById('apartments-component-wrapper')) {
+    addApartmentsComponent();
+  }
 
   //Fa in modo che la navbar vari tra invisibile e visibile nella home.
   $(function(e) {

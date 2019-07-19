@@ -2,71 +2,101 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 
-export default class ApartmentComponent extends Component {
+export default class Apartments extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      apartments:[]
+      sponsoredApartments:[],
+      queryApartments:[]
     }
-    if (this.props.sponsoreds) {
-      this.getSponsoreds();
+
+    if (this.props.sponsoreds==="all") {
+      this.getSponsoreds(false);
+    } else if (this.props.sponsoreds===true) {
+      this.getSponsoreds(true);
     } else {
-      this.getResults();
+      this.getInitResults();
     }
   }
 
-  getSponsoreds(){
-    axios.get(`/sponsoreds`)
+  getSponsoreds(limitSponsoreds){
+    axios.get(`/sponsoreds` , {
+      params: {
+        limit:limitSponsoreds
+      }
+    })
     .then(res => {
-      this.setState({apartments:res.data})
+      this.setState({sponsoredApartments:res.data})
     })
     .catch((error) => {
       console.log(error);
     });
   }
 
-  getSponsoreds(){
-    //Qui dovresti chiamare la funzione search del componente addressSearch e farti ritornare i risultati
+  getInitResults(){
     axios.get(`/search`, {
       params: {
-        advancedSearch:true,
-
+        lat:this.props.lat,
+        lon:this.props.lon,
+        advancedSearch:this.props.advancedSearch
       }
     })
     .then(res => {
-      console.log(res);
+      this.setState({queryApartments:res.data})
     })
     .catch((error) => {
-      console.log(error);
     });
   }
 
   render() {
+    let apartmentArr=-1;
+    let emptyContent='';
+
+    if (this.props.updateResults) {
+      apartmentArr=this.props.results;
+    } else if (this.props.sponsoreds===true || this.props.sponsoreds==="all") {
+      apartmentArr=this.state.sponsoredApartments;
+    } else {
+      apartmentArr=this.state.queryApartments;
+    }
+
+    if (apartmentArr.length==0 && this.props.sponsoreds===true || this.props.sponsoreds==="all") {
+      emptyContent= (<h1>Non ci sono appartamenti sponsorizzati!</h1>)
+    } else if (apartmentArr.length==0) {
+      emptyContent= (<h1>Non ci sono risultati!</h1>)
+    }
+
     return (
       <div className="d-flex flex-wrap">
-      {this.state.apartments.map((value, index) => {
-        return <div  key={index} className="apartment col-lg-4 p-5">
-        <div className="apartment-wrapper">
-        <a href="showIndex">
-        <img src={value.image} className="img-fluid"/>
-        <div className="content-apartment">
-        <span className="description">{value.description}</span>
-        <span className="address">{value.address}</span>
-        <span>{value.visuals.length} visualizzazione</span>
-        <span>{value.visuals.length} visualizzazioni</span>
-        </div>
-        </a>
-        </div>
-        </div>
-      })}
+        {apartmentArr.map((value, index) => {
+          return <div  key={index} className="apartment col-lg-4 p-5">
+            <div className="apartment-wrapper">
+              <a href={"/show/" + value.id}>
+                <img src={value.image} className="img-fluid"/>
+                <div className="content-apartment">
+                  <p className="description">{value.description}</p>
+                  <p className="address">{value.address}</p>
+                  <p>{value.visuals.length} {value.visuals.length==1 ? "visualizzazione" : "visualizzazioni"} </p>
+                </div>
+              </a>
+            </div>
+          </div>
+        })}
+        {emptyContent}
       </div>
     );
   }
 }
 
+// if (document.getElementById('sponsoreds-wrapper')) {
+//   const apartmentComponent = document.getElementById('sponsoreds-wrapper');
+//   const props = Object.assign({},apartmentComponent.dataset);
+//   ReactDOM.render(<ApartmentComponent {...props}/>, document.getElementById('sponsoreds-wrapper'));
+// }
+//
 if (document.getElementById('apartments-component-wrapper')) {
-  const apartmentComponent = document.querySelector('[data-sponsoreds]');
+  const apartmentComponent = document.getElementById('apartments-component-wrapper');
   const props = Object.assign({},apartmentComponent.dataset);
-  ReactDOM.render(<ApartmentComponent {...props}/>, document.getElementById('apartments-component-wrapper'));
+  ReactDOM.render(<Apartments {...props}/>, document.getElementById('apartments-component-wrapper'));
 }

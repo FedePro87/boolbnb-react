@@ -3,12 +3,24 @@ import ReactDOM from 'react-dom';
 
 export default class AddressSearchComponent extends Component {
   constructor(props) {
-    super(props)
+    super(props);
+
+    let address="";
+
+
+    if (this.props.address!=null) {
+      address=this.props.address;
+    }
+
+    if (address=="") {
+      address="Roma - RM";
+    }
+
+    this.preventInfiniteLoading={};
 
     this.state = {
-      realTimeAddress: this.props.address,
+      realTimeAddress: address,
       results:[],
-      homeSearch:true,
       addressesSelected:false,
       latComp:'',
       lonComp:'',
@@ -16,9 +28,37 @@ export default class AddressSearchComponent extends Component {
     }
 
     this.addressFocus=this.addressFocus.bind(this);
-    this.addressChanged=this.addressChanged.bind(this);
     this.closeButtonClicked=this.closeButtonClicked.bind(this);
     this.addressSelected=this.addressSelected.bind(this);
+    this.handleOutsideClick=this.handleOutsideClick.bind(this);
+    this.addressChanged=this.addressChanged.bind(this);
+  }
+
+  componentDidMount(){
+    this.search(true);
+    document.addEventListener('click', this.handleOutsideClick);
+  }
+
+  componentWillReceiveProps() {
+    if (this.props.updateNow) {
+      this.search(true);
+    }
+  }
+
+  stopUpdate(){
+    this.props.stopUpdate();
+  }
+
+  updateResults(resultsArray){
+    this.props.updateResults(resultsArray);
+  }
+
+  handleOutsideClick(e){
+    e.stopPropagation();
+    //FIXME La classe esclusa è troppo scriptata.
+    if (e.target.className!=="address-search-spa" && e.target.className!=="fas fa-times" && e.target.className!=="query-selector-spa") {
+      this.setState({results:[],showClose:false});
+    }
   }
 
   closeButtonClicked(){
@@ -28,13 +68,13 @@ export default class AddressSearchComponent extends Component {
   addressSelected(e){
     let selectedAddress=$(e.target).text();
     this.setState({realTimeAddress:selectedAddress,results:[],addressesSelected:true,showClose:false},function(){
-      this.search();
+      this.search(true);
     });
   }
 
   addressFocus(e){
-    this.setState({realTimeAddress:e.target.value,addressesSelected:false},function () {
-      this.search(true);
+    this.setState({addressesSelected:false,showClose:true},function () {
+      this.search();
     });
   }
 
@@ -48,7 +88,7 @@ export default class AddressSearchComponent extends Component {
     }
 
     this.setState({realTimeAddress:e.target.value,addressesSelected:false,showClose:queryIsEmpty},function () {
-      this.search(true);
+      this.search();
     });
   };
 
@@ -78,7 +118,7 @@ export default class AddressSearchComponent extends Component {
         }
 
         //Popola di nuovo i risultati soltanto se sto digitando un indirizzo. Non lo fa in tutti gli altri casi.
-        if (!self.state.addressesSelected) {
+        if (!addressesSelected) {
           self.setState({results:addressArray});
         }
 
@@ -89,21 +129,14 @@ export default class AddressSearchComponent extends Component {
         self.setState({latComp:lat,lonComp:lon});
 
         //Se è nella pagina iniziale, si è ormai salvato già i dati sul componente (indirizzo, lat e lon), quindi può tranquillamente finire qui.
-        if (self.state.homeSearch) {
+        if (self.props.home) {
           return true;
         }
 
-        if (advancedData!=null) {
-          var numberOfRooms = advancedData.number_of_rooms;
-          var bedrooms = advancedData.bedrooms;
-          var radius = advancedData.radius;
-          var services = advancedData.services;
-        } else {
-          var numberOfRooms = 1;
-          var bedrooms = 1;
-          var radius = 1;
-          var services = [];
-        }
+        var numberOfRooms = self.props.number_of_rooms;
+        var bedrooms = self.props.bedrooms;
+        var radius = self.props.radius;
+        var services = self.props.queryServices;
 
         self.apartmentsDatabaseSearch(lat,lon,numberOfRooms,bedrooms,radius,services);
       },
@@ -127,12 +160,12 @@ export default class AddressSearchComponent extends Component {
         bedrooms: bedrooms,
         radius: radius,
         services:services,
-        advancedSearch:self.advancedSearch,
+        advancedSearch:self.props.advancedSearch,
       },
       success:function(inData,state){
         let resultsArray = JSON.parse(inData);
-
-        self.eventHub.$emit('updateSearchResults', resultsArray);
+        self.updateResults(resultsArray);
+        self.stopUpdate();
       },
       error:function(request, state, error){
         console.log(request);
@@ -161,5 +194,7 @@ export default class AddressSearchComponent extends Component {
 }
 
 if (document.getElementById('address-search-component-wrapper')) {
-  ReactDOM.render(<AddressSearchComponent />, document.getElementById('address-search-component-wrapper'));
+  const addressSearchComponent = document.getElementById('address-search-component-wrapper');
+  const props = Object.assign({},addressSearchComponent.dataset);
+  ReactDOM.render(<AddressSearchComponent {...props}/>, document.getElementById('address-search-component-wrapper'));
 }

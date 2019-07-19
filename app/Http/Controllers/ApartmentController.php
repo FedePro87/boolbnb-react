@@ -108,14 +108,20 @@ class ApartmentController extends Controller
     return $statsArray;
   }
 
-  public function getSponsoreds(){
+  public function getSponsoreds(Request $request){
+    $limit= $request['limit'];
     $apartments= $this->showSponsored()->sponsoreds;
-    $maxResults=3;
 
-    $randIndex = array_rand($apartments, $maxResults);
+    if ($limit==="true") {
+      $maxResults=3;
 
-    for ($i=0; $i < $maxResults; $i++) {
-      $sponsoredApartments[]= $apartments[$randIndex[$i]];
+      $randIndex = array_rand($apartments, $maxResults);
+
+      for ($i=0; $i < $maxResults; $i++) {
+        $sponsoredApartments[]= $apartments[$randIndex[$i]];
+      }
+    } else {
+      $sponsoredApartments=$apartments;
     }
 
     return json_encode($sponsoredApartments);
@@ -165,11 +171,6 @@ class ApartmentController extends Controller
     //Per ora è uno perché ho solo uno sponsorizzato.
     $max=1;
     $sponsoredApartments= $this->showSponsored()->sponsoreds;
-    // $randIndex = array_rand($sponsoreds, $max);
-    //
-    // for ($i=0; $i < $max; $i++) {
-    //   $sponsoredApartments[]= $sponsoreds[$randIndex[$i]];
-    // }
 
     $services=Service::all();
     $advancedSearch=$request['advancedSearch'];
@@ -198,17 +199,17 @@ class ApartmentController extends Controller
 
 
     if ($numberOfRooms!=null && $numberOfRooms!=0) {
-      $queryApartments= $queryApartments->where('number_of_rooms',$numberOfRooms);
+      $queryApartments= $queryApartments->where('number_of_rooms', '>=' ,$numberOfRooms);
     }
 
     if ($bedrooms!=null && $bedrooms!=0) {
-      $queryApartments= $queryApartments->where('bedrooms',$bedrooms);
+      $queryApartments= $queryApartments->where('bedrooms',  '>=' ,$bedrooms);
     }
 
     if ($queryServices!=null) {
       foreach($queryServices as $service){
         $queryApartments = $queryApartments->whereHas('services', function($q)use($service){
-          $q->where('service_id', $service); //this refers id field from services table
+          $q->where('service_id', $service);
         });
       }
     }
